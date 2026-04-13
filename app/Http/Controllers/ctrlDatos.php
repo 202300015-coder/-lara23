@@ -62,6 +62,7 @@ class ctrlDatos extends Controller
         $apiUrl = env('VIEW_MIO_API_URL', $defaultApiUrl);
         $mensaje = null;
         $fuenteMostrada = $apiUrl;
+        $data = [];
 
         $partes = parse_url($apiUrl);
         if (!empty($partes['scheme']) && !empty($partes['host'])) {
@@ -71,19 +72,34 @@ class ctrlDatos extends Controller
             }
         }
 
-        $response = Http::acceptJson()
-            ->timeout(20)
-            ->get($apiUrl);
+        try {
+            $requestHost = request()->getHost();
+            $apiHost = parse_url($apiUrl, PHP_URL_HOST);
 
-        $data = $response->successful() ? $response->json() : [];
+            // Evita auto-llamadas al mismo host que pueden provocar timeout/500 en un solo worker.
+            if (!empty($apiHost) && $apiHost === $requestHost) {
+                $response = Http::acceptJson()
+                    ->timeout(20)
+                    ->get('https://api.sampleapis.com/movies/comedy');
+            } else {
+                $response = Http::acceptJson()
+                    ->timeout(20)
+                    ->get($apiUrl);
+            }
 
-        if (!is_array($data)) {
-            $decoded = json_decode($response->body(), true);
-            $data = is_array($decoded) ? $decoded : [];
+            $data = $response->successful() ? $response->json() : [];
+
+            if (!is_array($data)) {
+                $decoded = json_decode($response->body(), true);
+                $data = is_array($decoded) ? $decoded : [];
+            }
+        } catch (\Throwable $e) {
+            $mensaje = 'Error al consultar la API configurada.';
+            $data = [];
         }
 
         if (empty($data)) {
-            $mensaje = 'No se pudieron obtener datos desde la API configurada: ' . $apiUrl;
+            $mensaje = $mensaje ?? ('No se pudieron obtener datos desde la API configurada: ' . $apiUrl);
         }
 
         $enlace = $data;
