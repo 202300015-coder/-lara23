@@ -58,8 +58,19 @@ class ctrlDatos extends Controller
 
     public function AccesoDatosViewMio()
     {
-        $apiUrl = env('VIEW_MIO_API_URL', 'https://lara23.onrender.com/api/comedy-hosted');
+        $defaultApiUrl = rtrim((string) env('APP_URL', 'http://127.0.0.1:8000'), '/') . '/api/comedy-hosted';
+        $apiUrl = env('VIEW_MIO_API_URL', $defaultApiUrl);
         $mensaje = null;
+        $fuenteMostrada = $apiUrl;
+
+        $partes = parse_url($apiUrl);
+        if (!empty($partes['scheme']) && !empty($partes['host'])) {
+            $fuenteMostrada = $partes['scheme'].'://'.$partes['host'];
+            if (!empty($partes['port'])) {
+                $fuenteMostrada .= ':'.$partes['port'];
+            }
+        }
+
         $response = Http::acceptJson()
             ->timeout(20)
             ->get($apiUrl);
@@ -77,7 +88,7 @@ class ctrlDatos extends Controller
 
         $enlace = $data;
 
-        return view('viewmio', compact('enlace', 'mensaje', 'apiUrl'));
+        return view('viewmio', compact('enlace', 'mensaje', 'apiUrl', 'fuenteMostrada'));
     }
 
 }
