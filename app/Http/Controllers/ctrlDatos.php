@@ -33,28 +33,51 @@ class ctrlDatos extends Controller
 
         return view('apimia')->with(compact('enlace'));
     }
-public function AccesoDatosViewMio()
-{
-    $apiUrl = env('VIEW_MIO_API_URL', 'https://api.sampleapis.com/movies/comedy');
-    $mensaje = null;
-    $response = Http::acceptJson()
-        ->timeout(20)
-        ->get($apiUrl);
 
-    $data = $response->successful() ? $response->json() : [];
+    public function ApiComedyHosted()
+    {
+        $response = Http::acceptJson()
+            ->timeout(20)
+            ->get('https://api.sampleapis.com/movies/comedy');
 
-    if (!is_array($data)) {
-        $decoded = json_decode($response->body(), true);
-        $data = is_array($decoded) ? $decoded : [];
+        if (!$response->successful()) {
+            return response()->json([
+                'message' => 'No se pudo obtener la fuente externa.',
+            ], 502);
+        }
+
+        $data = $response->json();
+
+        if (!is_array($data)) {
+            $decoded = json_decode($response->body(), true);
+            $data = is_array($decoded) ? $decoded : [];
+        }
+
+        return response()->json($data);
     }
 
-    if (empty($data)) {
-        $mensaje = 'No se pudieron obtener datos desde la API configurada: ' . $apiUrl;
+    public function AccesoDatosViewMio()
+    {
+        $apiUrl = env('VIEW_MIO_API_URL', 'https://lara23.onrender.com/api/comedy-hosted');
+        $mensaje = null;
+        $response = Http::acceptJson()
+            ->timeout(20)
+            ->get($apiUrl);
+
+        $data = $response->successful() ? $response->json() : [];
+
+        if (!is_array($data)) {
+            $decoded = json_decode($response->body(), true);
+            $data = is_array($decoded) ? $decoded : [];
+        }
+
+        if (empty($data)) {
+            $mensaje = 'No se pudieron obtener datos desde la API configurada: ' . $apiUrl;
+        }
+
+        $enlace = $data;
+
+        return view('viewmio', compact('enlace', 'mensaje', 'apiUrl'));
     }
-
-    $enlace = $data;
-
-    return view('viewmio', compact('enlace', 'mensaje', 'apiUrl'));
-}
 
 }

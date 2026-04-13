@@ -22,7 +22,9 @@ Route::middleware('auth')->group(function () {
 Route::get('/datos', [ctrlDatos::class, 'AccesoDatosVista']);
 Route::get('/datos-link', [ctrlDatos::class, 'AccesoDatosVistaLink']);
 Route::get('/api-mia', [ctrlDatos::class, 'AccesoDatosApiMia']);
+Route::get('/api/comedy-hosted', [ctrlDatos::class, 'ApiComedyHosted']);
 Route::get('/view-mio', [ctrlDatos::class, 'AccesoDatosViewMio']);
+Route::get('/viewmio', [ctrlDatos::class, 'AccesoDatosViewMio']);
 
 
 require __DIR__.'/auth.php';
