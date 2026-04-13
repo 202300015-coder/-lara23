@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ctrlDatos;
 
 
-Route::get('/', [ctrlDatos::class, 'AccesoDatosViewMio']);
+Route::get('/', [ctrlDatos::class, 'ApiComedyHosted']);
 
 Route::get('/dashboard', function () {
     return view('dashboard');
