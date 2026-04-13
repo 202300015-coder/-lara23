@@ -58,7 +58,8 @@ class ctrlDatos extends Controller
 
     public function AccesoDatosViewMio()
     {
-        $defaultApiUrl = rtrim((string) env('APP_URL', 'http://127.0.0.1:8000'), '/') . '/api/comedy-hosted';
+        $hostUrl = request()->getSchemeAndHttpHost();
+        $defaultApiUrl = rtrim($hostUrl, '/') . '/api/comedy-hosted';
         $apiUrl = env('VIEW_MIO_API_URL', $defaultApiUrl);
         $mensaje = null;
         $fuenteMostrada = $apiUrl;
