@@ -62,16 +62,8 @@ class ctrlDatos extends Controller
         $defaultApiUrl = rtrim($hostUrl, '/') . '/api/comedy-hosted';
         $apiUrl = env('VIEW_MIO_API_URL', $defaultApiUrl);
         $mensaje = null;
-        $fuenteMostrada = $apiUrl;
+        $fuenteMostrada = 'https://lara23emi.onrender.com/';
         $data = [];
-
-        $partes = parse_url($apiUrl);
-        if (!empty($partes['scheme']) && !empty($partes['host'])) {
-            $fuenteMostrada = $partes['scheme'].'://'.$partes['host'];
-            if (!empty($partes['port'])) {
-                $fuenteMostrada .= ':'.$partes['port'];
-            }
-        }
 
         try {
             $requestHost = request()->getHost();
