@@ -23,6 +23,7 @@ Route::get('/api-mia', [ctrlDatos::class, 'AccesoDatosApiMia']);
 Route::get('/api/comedy-hosted', [ctrlDatos::class, 'ApiComedyHosted']);
 Route::get('/view-mio', [ctrlDatos::class, 'AccesoDatosViewMio']);
 Route::get('/viewmio', [ctrlDatos::class, 'AccesoDatosViewMio']);
-
+//modificar esto
+Route::get('/detalle-api/{id}', [ctrlDatos::class, 'detalle'])->name('tj.detalle');
 
 require __DIR__.'/auth.php';

@@ -99,5 +99,49 @@ class ctrlDatos extends Controller
 
         return view('viewmio', compact('enlace', 'mensaje', 'apiUrl', 'fuenteMostrada'));
     }
+    public function detalle($id)
+    {
+        $pelicula = null;
+
+        try {
+            $responseById = Http::acceptJson()
+                ->timeout(20)
+                ->get("https://api.sampleapis.com/movies/comedy/$id");
+
+            $dataById = $responseById->successful() ? $responseById->json() : [];
+            if (!is_array($dataById)) {
+                $decodedById = json_decode($responseById->body(), true);
+                $dataById = is_array($decodedById) ? $decodedById : [];
+            }
+
+            if (isset($dataById['id']) && (string) $dataById['id'] === (string) $id) {
+                $pelicula = $dataById;
+            }
+
+            if (!$pelicula) {
+                $responseList = Http::acceptJson()
+                    ->timeout(20)
+                    ->get('https://api.sampleapis.com/movies/comedy');
+
+                $dataList = $responseList->successful() ? $responseList->json() : [];
+                if (!is_array($dataList)) {
+                    $decodedList = json_decode($responseList->body(), true);
+                    $dataList = is_array($decodedList) ? $decodedList : [];
+                }
+
+                $pelicula = collect($dataList)->first(function ($item) use ($id) {
+                    return is_array($item) && isset($item['id']) && (string) $item['id'] === (string) $id;
+                });
+            }
+        } catch (\Throwable $e) {
+            $pelicula = null;
+        }
+
+        if (!$pelicula) {
+            return redirect('/viewmio')->with('mensaje', 'No se encontro la pelicula solicitada.');
+        }
+
+        return view('vistadetalles', compact('pelicula'));
+    }
 
 }
