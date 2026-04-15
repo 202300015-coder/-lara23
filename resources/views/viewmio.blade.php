@@ -55,17 +55,22 @@
         for (const key of posibles) {
             const valor = pelicula[key];
             if (typeof valor === 'string' && valor.trim() !== '') {
-                return valor;
+                return { key, url: valor };
             }
         }
 
         for (const [clave, valor] of Object.entries(pelicula)) {
             if (typeof valor === 'string' && /^https?:\/\//i.test(valor) && /\.(jpg|jpeg|png|webp|gif)(\?|$)/i.test(valor)) {
-                return valor;
+                return { key: clave, url: valor };
             }
         }
 
-        return null;
+        return { key: null, url: null };
+    };
+
+    const esCampoId = (clave) => {
+        const lower = clave.toLowerCase();
+        return lower === 'id' || lower.startsWith('id') || lower.endsWith('id');
     };
 
     const valorTexto = (valor) => {
@@ -79,12 +84,12 @@
         btn.addEventListener('click', () => {
             const index = Number(btn.getAttribute('data-index'));
             const pelicula = peliculas[index] || {};
-            const imagen = buscarImagen(pelicula);
+            const imagenInfo = buscarImagen(pelicula);
 
             modalDetalles.innerHTML = '';
 
-            if (imagen) {
-                modalImagen.src = imagen;
+            if (imagenInfo.url) {
+                modalImagen.src = imagenInfo.url;
                 modalImagen.style.display = 'block';
             } else {
                 modalImagen.removeAttribute('src');
@@ -92,7 +97,8 @@
             }
 
             Object.entries(pelicula)
-                .filter(([clave]) => clave.toLowerCase() !== 'id')
+                .filter(([clave]) => !esCampoId(clave))
+                .filter(([clave]) => !(imagenInfo.key && clave === imagenInfo.key))
                 .forEach(([clave, valor]) => {
                     const fila = document.createElement('p');
                     fila.style.margin = '0 0 8px 0';
