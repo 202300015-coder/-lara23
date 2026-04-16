@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ctrlDatos;
+use App\Http\Controllers\CategoryController;
 
 
 Route::get('/', [ctrlDatos::class, 'ApiComedyHosted']);
@@ -25,5 +26,9 @@ Route::get('/view-mio', [ctrlDatos::class, 'AccesoDatosViewMio']);
 Route::get('/viewmio', [ctrlDatos::class, 'AccesoDatosViewMio']);
 //modificar esto
 Route::get('/detalle-api/{id}', [ctrlDatos::class, 'detalle'])->name('tj.detalle');
+
+Route::get('/categorias', [CategoryController::class, 'index'])->name('categories.index');
+Route::post('/categorias', [CategoryController::class, 'store'])->name('categories.store');
+Route::delete('/categorias/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
 
 require __DIR__.'/auth.php';
