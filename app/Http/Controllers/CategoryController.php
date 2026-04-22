@@ -9,7 +9,7 @@ class CategoryController extends Controller
 {
     public function index()
     {
-        $categories = Category::latest()->get();
+        $categories = Category::orderBy('id', 'asc')->get();
 
         return view('categories.index', compact('categories'));
     }
@@ -18,12 +18,29 @@ class CategoryController extends Controller
     {
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string'],
+            'description' => ['nullable', 'string'],
         ]);
 
         Category::create($data);
 
         return redirect()->route('categories.index')->with('mensaje', 'Categoria creada correctamente.');
+    }
+
+    public function edit(Category $category)
+    {
+        return view('categories.edit', compact('category'));
+    }
+
+    public function update(Request $request, Category $category)
+    {
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
+        ]);
+
+        $category->update($data);
+
+        return redirect()->route('categories.index')->with('mensaje', 'Categoria actualizada correctamente.');
     }
 
     public function destroy(Category $category)
