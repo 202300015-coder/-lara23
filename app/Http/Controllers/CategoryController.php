@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
@@ -45,7 +46,19 @@ class CategoryController extends Controller
 
     public function destroy(Category $category)
     {
-        $category->delete();
+        if ($category->products()->exists()) {
+            return redirect()
+                ->route('categories.index')
+                ->with('error', 'No se puede eliminar la categoria porque tiene productos asociados.');
+        }
+
+        try {
+            $category->delete();
+        } catch (QueryException $e) {
+            return redirect()
+                ->route('categories.index')
+                ->with('error', 'No se puede eliminar la categoria porque tiene productos asociados.');
+        }
 
         return redirect()->route('categories.index')->with('mensaje', 'Categoria eliminada correctamente.');
     }

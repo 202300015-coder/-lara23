@@ -10,6 +10,7 @@
         h1 { margin: 0 0 16px; }
         h2 { margin: 0 0 12px; font-size: 22px; }
         .message { background: #e8f7eb; color: #116530; border: 1px solid #b8e6c2; padding: 10px 12px; border-radius: 6px; margin-bottom: 14px; }
+        .message-error { background: #fdecec; color: #8a1c1c; border: 1px solid #f5c2c2; padding: 10px 12px; border-radius: 6px; margin-bottom: 14px; }
         .errors { background: #fdecec; color: #8a1c1c; border: 1px solid #f5c2c2; padding: 10px 12px; border-radius: 6px; margin-bottom: 14px; }
         .card { background: #fff; border: 1px solid #d8dee4; border-radius: 8px; padding: 16px; margin-bottom: 18px; }
         .form-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
@@ -34,6 +35,10 @@
 
     @if(session('mensaje'))
         <div class="message">{{ session('mensaje') }}</div>
+    @endif
+
+    @if(session('error'))
+        <div class="message-error">{{ session('error') }}</div>
     @endif
 
     @if(isset($errors) && $errors->any())
