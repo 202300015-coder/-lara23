@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Validator;
 
 class ProductApiController extends Controller
@@ -67,11 +68,11 @@ class ProductApiController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'name' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string', 'max:255'],
-            'descriptionLong' => ['required', 'string'],
-            'price' => ['required', 'numeric', 'min:0'],
-            'category_id' => ['nullable', 'exists:categories,id'],
+            'name' => ['sometimes', 'required', 'string', 'max:255'],
+            'description' => ['sometimes', 'required', 'string', 'max:255'],
+            'descriptionLong' => ['sometimes', 'required', 'string'],
+            'price' => ['sometimes', 'required', 'numeric', 'min:0'],
+            'category_id' => ['sometimes', 'nullable', 'exists:categories,id'],
         ]);
 
         if ($validator->fails()) {
@@ -81,7 +82,16 @@ class ProductApiController extends Controller
             ], 422);
         }
 
-        $product->update($validator->validated());
+        $data = $validator->validated();
+
+        if (empty($data)) {
+            return response()->json([
+                'message' => 'No fields provided for update.',
+            ], 422);
+        }
+
+        $product->update($data);
+        $product->refresh();
         $product->load('category');
 
         return response()->json($product, 200);
@@ -99,6 +109,6 @@ class ProductApiController extends Controller
 
         $product->delete();
 
-        return response()->json(null, 204);
+        return response()->json(null, Response::HTTP_NO_CONTENT);
     }
 }

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
@@ -65,12 +66,13 @@ class CategoryApiController extends Controller
 
         $validator = Validator::make($request->all(), [
             'name' => [
+                'sometimes',
                 'required',
                 'string',
                 'max:255',
                 Rule::unique('categories', 'name')->ignore($category->id),
             ],
-            'description' => ['nullable', 'string'],
+            'description' => ['sometimes', 'nullable', 'string'],
         ]);
 
         if ($validator->fails()) {
@@ -80,7 +82,16 @@ class CategoryApiController extends Controller
             ], 422);
         }
 
-        $category->update($validator->validated());
+        $data = $validator->validated();
+
+        if (empty($data)) {
+            return response()->json([
+                'message' => 'No fields provided for update.',
+            ], 422);
+        }
+
+        $category->update($data);
+        $category->refresh();
 
         return response()->json($category, 200);
     }
@@ -103,6 +114,6 @@ class CategoryApiController extends Controller
 
         $category->delete();
 
-        return response()->json(null, 204);
+        return response()->json(null, Response::HTTP_NO_CONTENT);
     }
 }
